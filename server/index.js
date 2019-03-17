@@ -5,7 +5,7 @@ const app = express();
 const config = require('./config/config');
 const routes = require('./api/api.js');
 
-require('mongoose').connect(config.db.url, { useNewUrlParser: true });
+// require('mongoose').connect(config.db.url, { useNewUrlParser: true });
 
 require('./middleware/appMiddleware')(app);
 
