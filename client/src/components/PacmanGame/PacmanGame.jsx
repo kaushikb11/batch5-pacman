@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { socketConnection, joinGame, leaveGame } from '../../api/socketService';
 import GamePage from '../Layout/GamePage';
 import {
-  boardCorners, codeToEntity, entityToCode, getGhosts, getPacman,
+  boardCorners, codeToEntity, entityToCode, getGhosts, getPacman, board,
 } from './constants';
 import {
   initSquareGridState,
@@ -45,9 +45,7 @@ class PacmanGame extends Component {
   }
 
   setInitialGameState = () => {
-    const gridState = initSquareGridState();
-
-
+    const gridState = initSquareGridState().slice();
     const [pacmanX, pacmanY, pacmanDirection] = getPacman();
     const pacman = {
       x: pacmanX, y: pacmanY, direction: pacmanDirection,
@@ -56,12 +54,20 @@ class PacmanGame extends Component {
     const ghostsArray = getGhosts().map(([x, y, direction]) => ({
       x, y, direction,
     }));
-
+    console.log(initSquareGridState(), 'gridState');
     this.setState({ gridState, pacman, ghosts: ghostsArray });
   }
 
   startGame = () => {
-    const { config, pacman } = this.state;
+    const { config, pacman, status } = this.state;
+    if (status === 2) {
+      // this.setInitialGameState();
+      this.setState({
+        score: 0,
+        status: 0,
+        moveGhostsCount: 0,
+      }, () => this.setInitialGameState());
+    }
     joinGame(pacman);
     this.animationHandler = setInterval(
       this.animateGame,
