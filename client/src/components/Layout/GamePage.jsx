@@ -5,6 +5,8 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import PropTypes from 'prop-types';
 import ScoreCard from '../UI/ScoreCard';
+import WebCanvas from '../PacmanGame/webcanvas';
+import './game.css'
 
 const styles = theme => ({
   root: {
@@ -23,7 +25,7 @@ const GamePage = (props) => {
       <Paper className={classes.root} elevation={1}>
         <Grid container spacing={14}>
           <Grid item xs={false} sm={false} md={3} lg={3} />
-          <Grid item md={6} lg={6} xs={12} sm={8}>
+          <Grid item md={4} lg={3} xs={3} sm={4}>
             <Button variant="outlined" size="medium" color="primary" onClick={startGame}>
               Start
             </Button>
@@ -38,7 +40,10 @@ const GamePage = (props) => {
             {render()}
           </Grid>
           <Grid container xs={6} sm={4} md={3} lg={3}>
-            <ScoreCard />
+            {/* <ScoreCard /> */}
+          <div className="webcanvas">
+          < WebCanvas />
+          </div>
           </Grid>
         </Grid>
       </Paper>

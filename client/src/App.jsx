@@ -8,14 +8,15 @@ import { Consumer } from './api/userContext';
 import { board, boardEdgeInPixel } from './components/PacmanGame/constants';
 
 const App = ({ history, location }) => (
+  // <PacmanGame width={boardEdgeInPixel} numberofCells={board.length} />
   <Consumer>
     {context => (
       <>
         <NavBar userContext={context} />
-        <div className="container">
-          <SimpleModal history={history} location={location} mode="GameStart" userContext={context} />
+        {/* <div className="container"> */}
+          {/* <SimpleModal history={history} location={location} mode="GameStart" userContext={context} /> */}
           <PacmanGame width={boardEdgeInPixel} numberofCells={board.length} />
-        </div>
+        {/* </div> */}
       </>
     )
     }

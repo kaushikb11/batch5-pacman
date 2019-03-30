@@ -298,18 +298,26 @@ class PacmanGame extends Component {
       gridState, pacman, score, status, ghosts,
     } = this.state;
     return (
+    // <div className="board">
+    //   <PacmanBoard
+    //         gridSize={gridSize}
+    //         gridState={gridState}
+    //         pacman={pacman}
+    //         ghosts={ghosts}
+    //       />
+    // </div>
       <GamePage
         startGame={this.startGame}
         score={score}
         status={status}
         render={() => (
-          <PacmanBoard
-            gridSize={gridSize}
-            gridState={gridState}
-            pacman={pacman}
-            ghosts={ghosts}
-          />
-        )}
+        <PacmanBoard
+          gridSize={gridSize}
+          gridState={gridState}
+          pacman={pacman}
+          ghosts={ghosts}
+        />
+      )}
       />
     );
   }
