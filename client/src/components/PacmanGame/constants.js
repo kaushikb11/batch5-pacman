@@ -88,6 +88,9 @@ export const getGhosts = () => [[13, 12, 'RIGHT'], [14, 12, 'LEFT'], [11, 12, 'D
 
 export const getPacman = () => [13, 14, 'RIGHT'];
 
+export const getEnergizers = () => [{ x: 3, y: 3 },
+  { x: 21, y: 3 }, { x: 3, y: 21 }, { x: 21, y: 21 }];
+
 export const boardEdgeInPixel = Math.min(window.innerWidth, window.innerHeight) * 0.65;
 
 const framesPerSecond = 4;

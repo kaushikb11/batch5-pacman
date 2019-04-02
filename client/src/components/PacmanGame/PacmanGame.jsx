@@ -11,6 +11,7 @@ import {
   entityToCode,
   getGhosts,
   getPacman,
+  getEnergizers,
   advanceFrameAfterTime,
   boardTranspose,
 } from './constants';
@@ -38,9 +39,12 @@ class PacmanGame extends Component {
     config: {
       refreshRate: advanceFrameAfterTime,
     },
+    energizers: [],
     moveGhostsCount: 0,
     scatterGhostspath: [],
     scatterStart: 75,
+    freight: false,
+    freightCount: 0,
   };
 
   componentDidMount() {
@@ -127,7 +131,9 @@ class PacmanGame extends Component {
       x, y, direction,
     }));
 
-    this.setState({ gridState, pacman, ghosts: ghostsArray });
+    this.setState({
+      gridState, pacman, ghosts: ghostsArray, energizers: getEnergizers(),
+    });
   }
 
   startGame = () => {
@@ -167,9 +173,18 @@ class PacmanGame extends Component {
     return arr;
   }
 
-  moveGhosts = ({ ghosts, gridState, scatterStart }) => {
+  ifPacmanOnGhost = (ghost) => {
+    const { pacman } = this.state;
+    const { x, y } = ghost;
+    if ((x === pacman.x) && (y === pacman.y)) return true;
+    return false;
+  }
+
+  moveGhosts = ({
+    ghosts, gridState, scatterStart, freight,
+  }) => {
     let { moveGhostsCount, scatterGhostspath } = this.state;
-    moveGhostsCount += 1;
+    if (!freight) moveGhostsCount += 1;
     const scatterEnd = scatterStart + 55;
     if (moveGhostsCount === scatterStart) {
       const gridWithWeights = getGridwithWeights(boardTranspose);
@@ -203,12 +218,20 @@ class PacmanGame extends Component {
     }
 
     const ghostsUpdated = ghosts.map(
-      ({ x, y, direction }) => getRandomAdjacentAvailableCell(gridState, { x, y, direction }),
+      ({ x, y, direction }) => {
+        if (freight) {
+          const pacmanOnGhost = this.ifPacmanOnGhost({ x, y });
+          if (pacmanOnGhost) return { x: 13, y: 15, direction: 'LEFT' };
+        }
+        return getRandomAdjacentAvailableCell(gridState, { x, y, direction });
+      },
     );
+    // console.log(ghostsUpdated);
     return {
       ghostsUpdated, moveGhostsCount,
     };
   };
+
 
   setGameStatus = (status) => {
     if (status === 'finish') {
@@ -230,23 +253,34 @@ class PacmanGame extends Component {
     return ispacmanDead;
   };
 
-  movePacman = ({ pacman, ghostsUpdated, gridState }) => {
+  movePacman = ({
+    pacman, ghostsUpdated, gridState, energizers, freight,
+  }) => {
     const { x, y, direction } = pacman;
+    const pacmanHadEnergizer = energizers.indexOf({ x, y });
 
-    const pacmanDead = this.dieIfOnGhost({ ghosts: ghostsUpdated, pacman });
-
-    if (pacmanDead) {
-      return {
-        pacmanUpdated: pacman,
-      };
+    if (pacmanHadEnergizer !== -1) {
+      this.pacmanOnEnergizer(pacmanHadEnergizer);
     }
-
+    if (!freight) {
+      const pacmanDead = this.dieIfOnGhost({ ghosts: ghostsUpdated, pacman });
+      if (pacmanDead) return { pacmanUpdated: pacman };
+    }
     let newLocation = moveInDirection({ x, y, direction });
 
     newLocation = isWall(gridState, newLocation) ? {} : moveInDirection({ x, y, direction });
     return {
       pacmanUpdated: { ...pacman, ...newLocation },
     };
+  }
+
+  pacmanOnEnergizer = (pacmanIndex) => {
+    const { energizers } = this.state;
+    energizers.splice(pacmanIndex, 1);
+    this.setState({
+      freight: true,
+      energizers,
+    });
   }
 
   eatFood = ({ pacman: newLocation, gridStateAfterPacmanMove }) => {
@@ -270,17 +304,34 @@ class PacmanGame extends Component {
     return false;
   }
 
+  dieIfOnGhost = ({ ghosts, pacman }) => {
+    if (this.ifAtGhosts({ ghosts, pacman })) {
+      this.setGameStatus('finish');
+      return true;
+    }
+    return false;
+  }
+
+  freightCounter = (freight, count) => {
+    if (count > 15) return [false, 0];
+    if (freight) return [true, count + 1];
+    return [false, 0];
+  }
+
   animateGame = () => {
     try {
       const {
-        pacman, ghosts, gridState, scatterStart,
+        pacman, ghosts, gridState, scatterStart, freight, freightCount,
       } = this.state;
       const { ghostsUpdated, moveGhostsCount } = this.moveGhosts(
-        { ghosts, gridState, scatterStart },
+        {
+          ghosts, gridState, scatterStart, freight,
+        },
       );
       const { pacmanUpdated } = this.movePacman({ pacman, ghostsUpdated, gridState });
+      const [freightMode, count] = this.freightCounter(freight, freightCount);
 
-      this.dieIfOnGhost({ ghosts: ghostsUpdated, pacman: pacmanUpdated });
+      if (!freight) this.dieIfOnGhost({ ghosts: ghostsUpdated, pacman: pacmanUpdated });
 
       const {
         score,
@@ -292,6 +343,8 @@ class PacmanGame extends Component {
         moveGhostsCount,
         ghosts: ghostsUpdated,
         pacman: pacmanUpdated,
+        freight: freightMode,
+        freightCount: count,
       });
     } catch (e) {
       clearInterval(this.animationHandler);
