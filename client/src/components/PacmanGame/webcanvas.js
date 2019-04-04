@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as handTrack from 'handtrackjs';
 import Deque from 'double-ended-queue';
+import { Button } from 'react-bootstrap';
 
 class WebCanvas extends Component {
     state = {
@@ -103,7 +104,7 @@ class WebCanvas extends Component {
 <div>
         <video id='myvideo' ref="video" width='300' height='400' autoPlay={true} />
         <div>
-        <button onClick={this.startVideo}> Start</button>
+        <Button variant="primary"onClick={this.startVideo}> Start</Button>
         </div>
         <div>
             <h2>{this.state.direction}</h2>
