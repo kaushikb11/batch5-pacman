@@ -5,8 +5,8 @@ import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import ButtonGroup from './ButtonGroup';
-
 
 const styles = theme => ({
   paper: {
@@ -16,10 +16,11 @@ const styles = theme => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing.unit * 4,
     outline: 'none',
-    top: '20%',
+    top: '50%',
+    minHeight: '319px',
     left: '50%',
     textAlign: 'center',
-    transform: 'translate(-50%, -20%)',
+    transform: 'translate(-50%, -50%)',
     alignItem: 'center',
   },
   bigAvatar: {
@@ -27,10 +28,13 @@ const styles = theme => ({
     width: 100,
     height: 100,
   },
+  progress: {
+    margin: theme.spacing.unit * 2,
+  },
 });
 
 class SimpleModal extends React.Component {
-  state = { open: true };
+  state = { open: true, mode: 'button' };
 
   closeModal = () => {
     this.setState({ open: false });
@@ -72,14 +76,30 @@ class SimpleModal extends React.Component {
         location={location}
         closeModal={this.closeModal}
         userContext={userContext}
+        toLoader={this.toLoaderMode}
         mode={mode}
       />
     );
   }
 
+  toLoaderMode = () => {
+    this.setState({ mode: 'loader' });
+  }
+
+  getLoader = () => {
+    const { classes } = this.props;
+    return (
+      <div>
+        <CircularProgress className={classes.progress} />
+        <Typography>Searching for another player for you...</Typography>
+      </div>
+    );
+  }
+
   render() {
     const { classes } = this.props;
-    const { open } = this.state;
+    const { open, mode } = this.state;
+    const loaderMode = 'loader';
     return (
       <div>
         <Modal
@@ -90,7 +110,8 @@ class SimpleModal extends React.Component {
           <div className={classes.paper}>
             {this.pacManImage()}
             {this.modalLabel()}
-            {this.buttonGroup()}
+            {mode === loaderMode ? this.getLoader() : this.buttonGroup()}
+
           </div>
         </Modal>
       </div>

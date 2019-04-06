@@ -1,7 +1,13 @@
 import pathfinding from 'pathfinding';
-import { entityToCode, board, directionValues } from './constants';
+import {
+  entityToCode,
+  getBoard,
+  directionValues,
+  codeToEntity,
+  boardCorners,
+} from './constants';
 
-export const initSquareGridState = () => board;
+export const initSquareGridState = getBoard;
 
 export const getGridwithWeights = (grid) => {
   const gridwithWeights = grid.map((array) => {
@@ -22,7 +28,7 @@ export const chaseLocation = (gridwithWeights, currentGhostLocation, targetGhost
   return path;
 };
 
-const isWall = (gridState, { x, y }) => Boolean(gridState[x][y] === entityToCode('wall'));
+export const isWall = (gridState, { x, y }) => Boolean(gridState[x][y] === entityToCode('wall'));
 
 export const getRandomAdjacentAvailableCell = (gridState, currentLocation) => {
   const { x, y, direction } = currentLocation;
@@ -44,4 +50,103 @@ export const getRandomAdjacentAvailableCell = (gridState, currentLocation) => {
     return randomAdjacentCell;
   }
   return getRandomAdjacentAvailableCell(gridState, currentLocation);
+};
+
+export const moveInDirection = ({ x, y, direction }) => {
+  const newLocation = {
+    x: x + directionValues[direction].x,
+    y: y + directionValues[direction].y,
+  };
+  return newLocation;
+};
+
+export const eatFood = ({ pacman: newLocation, gridState }) => {
+  const entityInCell = codeToEntity(gridState[newLocation.x][newLocation.y]);
+  let { score } = newLocation;
+  if (entityInCell === 'food') {
+    score += 1;
+  } else if (entityInCell === 'energizer') {
+    score += 5;
+  }
+  // eslint-disable-next-line no-param-reassign
+  gridState[newLocation.x][newLocation.y] = entityToCode('free');
+  return { score, gridStateAfterEatingFood: gridState };
+};
+
+export const ifAtGhosts = ({ ghosts, pacman }) => {
+  const isAtSameLocation = (
+    { x: x1, y: y1 },
+    { x: x2, y: y2 },
+  ) => (x1 === x2) && (y1 === y2);
+
+  const ispacmanDead = ghosts
+    .some(ghost => isAtSameLocation(ghost, pacman));
+
+  return ispacmanDead;
+};
+
+export const addPositionsToArray = (arr, index) => {
+  const scatterTime = 55;
+  if (arr.length < scatterTime) {
+    arr.push(boardCorners[index]);
+    return addPositionsToArray(arr, index);
+  }
+  return arr;
+};
+
+export const dieIfOnGhost = ({ ghosts, pacman, fright }) => {
+  if (fright) return false;
+  if (ifAtGhosts({ ghosts, pacman })) {
+    return true;
+  }
+  return false;
+};
+
+
+export const movePacman = ({
+  pacman, ghostsUpdated, gridState, fright, frightCount,
+}) => {
+  const { x, y, direction } = pacman;
+  let frightMode = fright;
+  let count = frightCount;
+  if (gridState[x][y] === codeToEntity('energizer')) {
+    frightMode = true;
+  }
+  if (count > 100) {
+    frightMode = false;
+    count = 0;
+  }
+  if (frightMode) count += 1;
+
+  const pacmanDead = dieIfOnGhost({ ghosts: ghostsUpdated, pacman, frightMode });
+  if (pacmanDead) {
+    return {
+      status: 2,
+      pacmanUpdated: pacman,
+      frightMode,
+      count,
+    };
+  }
+
+  let newLocation = moveInDirection({ x, y, direction });
+
+  newLocation = isWall(gridState, newLocation) ? {} : moveInDirection({ x, y, direction });
+  return {
+    pacmanUpdated: { ...pacman, ...newLocation },
+    status: 0,
+    frightMode,
+    count,
+  };
+};
+
+export const hasFoodFinished = ({ gridState }) => {
+  let food = false;
+  gridState.forEach((row) => {
+    row.forEach((cell) => {
+      if (cell === entityToCode('food')) {
+        food = true;
+      }
+    });
+  });
+  return food;
 };

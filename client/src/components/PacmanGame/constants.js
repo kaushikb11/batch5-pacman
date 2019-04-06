@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import ghostImage1 from '../../sprites/blinky.png';
 import ghostImage2 from '../../sprites/inky.png';
 import ghostImage3 from '../../sprites/clyde.png';
@@ -12,7 +14,7 @@ export const ghostImages = [
   afraidGhost,
 ];
 
-export const board = [
+export const getBoard = () => [
   [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
   [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
   [4, 1, 4, 4, 4, 4, 4, 1, 4, 4, 4, 1, 4, 1, 4, 4, 4, 1, 4, 1, 4, 4, 4, 1, 4],
@@ -39,6 +41,8 @@ export const board = [
   [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
   [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
 ];
+
+export const boardTranspose = getBoard()[0].map((col, i) => getBoard().map(row => row[i]));
 
 export const codeToEntity = (code) => {
   const entityMap = {
@@ -88,8 +92,21 @@ export const getPacman = () => [13, 14, 'RIGHT'];
 
 export const boardEdgeInPixel = Math.min(window.innerWidth, window.innerHeight) * 0.65;
 
-const framesPerSecond = 4;
+const framesPerSecond = 5;
 
 export const advanceFrameAfterTime = 1000 / framesPerSecond;
 
-export const entitiesAnimationDurationInSecond = 0.24;
+export const entitiesAnimationDurationInSecond = 1 / framesPerSecond;
+
+export const arrowKeysDirections = {
+  ArrowLeft: 'LEFT',
+  ArrowUp: 'UP',
+  ArrowRight: 'RIGHT',
+  ArrowDown: 'DOWN',
+};
+
+export const locationIn2D = PropTypes.shape({
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
+  direction: PropTypes.string,
+});

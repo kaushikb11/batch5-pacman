@@ -1,7 +1,7 @@
 import pathfinding from 'pathfinding';
-import { board, entityToCode, directionValues } from './constants';
+import { getBoard, entityToCode, directionValues } from './constants';
 
-export const initSquareGridState = () => board;
+export const initSquareGridState = () => getBoard();
 
 const borderWalls = (numofCells) => {
   const cellsArray = [...Array(numofCells).keys()];
@@ -131,4 +131,49 @@ export const moveInDirection = ({ x, y, direction }) => {
     y: y + directionValues[direction].y,
   };
   return newLocation;
+};
+
+export const locationOnCanvas = ({
+  gridX, gridY, gridSize, centerEntity = false,
+}) => {
+  const canvasPos = gridPostion => gridPostion * gridSize;
+  const [x, y] = [gridX, gridY]
+    .map(value => (centerEntity ? canvasPos(value + 0.5) : canvasPos(value)));
+  return { x, y };
+};
+
+const isAnObject = value => typeof value === 'object' && value !== null;
+const isEmptyObject = obj => isAnObject(obj) && Object.keys(obj).length === 0;
+
+const stripEmptyObjValues = obj => Object.keys(obj).reduce((acc, key) => {
+  if (isEmptyObject(obj[key])) {
+    return acc;
+  }
+  return {
+    ...acc,
+    [key]: obj[key],
+  };
+}, {});
+
+export const getObjectDiffs = ({ oldObj, newObj }) => {
+  const diffWithEmptyObjAsValue = Object.keys(newObj).reduce((acc, key) => {
+    if (isAnObject(oldObj[key]) && isAnObject(newObj[key])) {
+      return {
+        ...acc,
+        [key]: getObjectDiffs({
+          oldObj: oldObj[key],
+          newObj: newObj[key],
+        }),
+      };
+    }
+
+    const noDiffInValue = oldObj[key] === newObj[key];
+
+    return noDiffInValue ? acc : {
+      ...acc,
+      [key]: newObj[key],
+    };
+  }, {});
+
+  return stripEmptyObjValues(diffWithEmptyObjAsValue);
 };

@@ -1,17 +1,17 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import PropTypes from 'prop-types';
 import ScoreCard from '../UI/ScoreCard';
 
-const styles = theme => ({
-  root: {
-    ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
-    width: '96%',
+const styles = () => ({
+  card: {
+    width: '80%',
+    margin: '15px auto',
+    borderRadius: '15px',
   },
 });
 
@@ -19,30 +19,41 @@ const GamePage = (props) => {
   const {
     render, classes, startGame, score, status,
   } = props;
+  const gameScore = [
+    {
+      name: 'player 1', score, isAlive: false, isHost: true,
+    },
+    {
+      name: 'player 2', score: 0, isAlive: false, isHost: false,
+    },
+  ];
+  const buttonMessage = () => {
+    if (status === 0) return 'Start';
+    if (status === 1) return 'Pause';
+    return 'Restart';
+  };
   return (
     <React.Fragment>
-      <Paper className={classes.root} elevation={1}>
-        <Grid container spacing={16}>
-          <Grid item xs={3} />
-          <Grid item xs={6}>
-            <Button variant="outlined" size="medium" color="primary" onClick={startGame}>
-              Start
-            </Button>
-            <div>
-              Score:
-              {score}
-            </div>
-            <div>
-              Status:
-              {status === 2 ? 'GAME OVER' : status}
-            </div>
-            {render()}
-          </Grid>
-          <Grid item xs={3} sm container>
-            <ScoreCard />
-          </Grid>
+      <Grid container justify="center" wrap="wrap">
+        <Grid item xs={false} sm={false} md={3} lg={4} />
+        <Grid item xs={12} sm={8} md={6} lg={4}>
+          {render()}
         </Grid>
-      </Paper>
+        <Grid item container direction="column" alignItems="center" xs={12} sm={4} md={3} lg={3}>
+          <ScoreCard score={gameScore} />
+          <Card className={classes.card}>
+            <CardContent>
+              <Button variant="outlined" size="medium" color="primary" onClick={startGame}>
+                {buttonMessage()}
+              </Button>
+              <div style={{ fontWeight: 'bold', fontSize: '110%', margin: '5px 0' }}>
+                STATUS:
+                {status === 2 ? 'GAME OVER' : status}
+              </div>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </React.Fragment>
   );
 };

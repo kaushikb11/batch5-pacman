@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Stage, Layer } from 'react-konva';
-import { codeToEntity, boardEdgeInPixel } from './constants';
+import { codeToEntity, boardEdgeInPixel, locationIn2D } from './constants';
 import Cell from './Cell';
 import Ghosts from './Ghosts';
-import PacmanEntity from './PacmanEntity';
+import AnimateEntity from './AnimateEntity';
 
 const PacmanBoard = ({
   gridState,
   gridSize,
   ghosts,
-  pacman,
+  pacmans,
 }) => {
   const nonMovingCells = gridState
     .map((row, rowIndex) => (row.map((_, columnIndex) => {
@@ -30,7 +30,7 @@ const PacmanBoard = ({
     <Stage width={boardEdgeInPixel} height={boardEdgeInPixel}>
       <Layer hitGraphEnabled={false}>
         {nonMovingCells}
-        <PacmanEntity location={pacman} gridSize={gridSize} />
+        {Object.keys(pacmans).map(playerId => <AnimateEntity key={playerId} location={pacmans[playerId]} gridSize={gridSize} entity="pacman" />)}
         <Ghosts ghosts={ghosts} gridSize={gridSize} />
       </Layer>
     </Stage>
@@ -44,15 +44,9 @@ PacmanBoard.propTypes = {
       PropTypes.number.isRequired,
     ).isRequired,
   ).isRequired,
-  ghosts: PropTypes.arrayOf(PropTypes.shape({
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
-    direction: PropTypes.string,
-  })).isRequired,
-  pacman: PropTypes.shape({
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
-    direction: PropTypes.string,
+  ghosts: PropTypes.arrayOf(locationIn2D).isRequired,
+  pacmans: PropTypes.shape({
+    [PropTypes.string.isRequired]: locationIn2D,
   }).isRequired,
 };
 

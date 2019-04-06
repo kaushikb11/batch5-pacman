@@ -6,6 +6,18 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
+  score: {
+    type: Number,
+    required: true,
+  },
+  googleId: {
+    type: Number,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
 });
 
-export default mongoose.model('user', UserSchema);
+module.exports = mongoose.model('User', UserSchema);
