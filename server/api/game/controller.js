@@ -137,8 +137,7 @@ class Game {
       } = movePacman({
         pacman, ghostsUpdated, gridState, fright, frightCount,
       });
-
-      const isDead = dieIfOnGhost({ ghosts: ghostsUpdated, pacman: pacmanUpdated });
+      const isDead = dieIfOnGhost({ ghosts: ghostsUpdated, pacman: pacmanUpdated, fright });
       if (isDead) {
         pacman.alive = false;
         this.endGame();
