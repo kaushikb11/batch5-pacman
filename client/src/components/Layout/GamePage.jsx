@@ -15,11 +15,26 @@ const styles = theme => ({
     width: '100%',
   },
 });
+class GamePage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      direction: '',
+    }
 
-const GamePage = (props) => {
-  const {
-    render, classes, startGame, score, status,
-  } = props;
+    this.getDirection = (direction) => {
+      if (direction.length !== 0) {
+        this.props.onChange(direction);
+        console.log('Working', direction);
+      }
+    }
+
+}
+
+  render() {
+    const {
+      render, classes, startGame, score, status, onChange,
+    } = this.props;
   return (
     <React.Fragment>
       <Paper className={classes.root} elevation={1}>
@@ -42,7 +57,7 @@ const GamePage = (props) => {
           <Grid container xs={6} sm={4} md={3} lg={3}>
             {/* <ScoreCard /> */}
           <div className="webcanvas">
-          < WebCanvas />
+          < WebCanvas onChange={this.getDirection} />
           </div>
           </Grid>
         </Grid>
@@ -50,6 +65,7 @@ const GamePage = (props) => {
     </React.Fragment>
   );
 };
+}
 
 GamePage.propTypes = {
   score: PropTypes.number.isRequired,

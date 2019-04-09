@@ -72,6 +72,12 @@ class PacmanGame extends Component {
     leaveGame();
   }
 
+  gestureDirection = (direction) => {
+    const { pacman } = this.state;
+    console.log(direction, 'Ayeee!!!!');
+    if (direction !== pacman.direction) this.setState({ pacman: { ...pacman, direction } });
+  }
+
   getObjectDiffs = ({ oldObj, newObj }) => {
     const isAnObject = value => typeof value === 'object' && value !== null;
     const isEmptyObject = obj => isAnObject(obj) && Object.keys(obj).length === 0;
@@ -310,14 +316,15 @@ class PacmanGame extends Component {
         startGame={this.startGame}
         score={score}
         status={status}
+        onChange={this.gestureDirection}
         render={() => (
-        <PacmanBoard
+          <PacmanBoard
           gridSize={gridSize}
           gridState={gridState}
           pacman={pacman}
           ghosts={ghosts}
-        />
-      )}
+          />
+        )}
       />
     );
   }

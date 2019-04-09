@@ -69,13 +69,13 @@ class WebCanvas extends Component {
             console.log('diff', dX, dY);
             if (Math.abs(dX) > 30) {
               if (Math.sign(dX) === 1) {
-                directions.Right = dX;
-              } else directions.Left = dX;
+                directions.RIGHT = dX;
+              } else directions.LEFT = dX;
             }
             if (Math.abs(dY) > 30) {
               if (Math.sign(dY) === 1) {
-                directions.Down = dY;
-              } else directions.Up = dY;
+                directions.DOWN = dY;
+              } else directions.UP = dY;
             }
             const directionsKeys = Object.keys(directions);
             if (directionsKeys.length === 1) {
@@ -101,16 +101,17 @@ class WebCanvas extends Component {
 
     render() {
       return (
-<div>
-        <video id='myvideo' ref="video" width='300' height='400' autoPlay={true} />
         <div>
-        <Button variant="primary"onClick={this.startVideo}> Start</Button>
-        </div>
-        <div>
+          <video id="myvideo" ref="video" width="300" height="400" autoPlay />
+          <div>
+            <Button variant="primary" onClick={this.startVideo}> Start</Button>
+          </div>
+          <div>
             <h2>{this.state.direction}</h2>
+            <h2>{this.props.onChange(this.state.direction)}</h2>
+          </div>
         </div>
-      </div>
-);
+      );
     }
 }
 
